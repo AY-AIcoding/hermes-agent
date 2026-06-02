@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hermes Agent 控制面板</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #fff;
+            padding: 40px 20px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 40px;
+            color: #ffd700;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+        }
+        .card h2 {
+            color: #ffd700;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #4ade80;
+        }
+        .dot.offline { background: #ef4444; }
+        .link {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: #ffd700;
+            color: #1a1a2e;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+        .link:hover { background: #ffed4a; }
+        .timestamp { color: #888; font-size: 0.9rem; margin-top: 10px; }
+        .metric {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #4ade80;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🤖 Hermes Agent 控制面板</h1>
+        
+        <div class="grid">
+            <div class="card">
+                <h2>📊 系统状态</h2>
+                <div class="status">
+                    <div class="dot"></div>
+                    <span>Gateway 运行中</span>
+                </div>
+                <div class="status">
+                    <div class="dot"></div>
+                    <span>Telegram 已连接</span>
+                </div>
+                <div class="status">
+                    <div class="dot"></div>
+                    <span>WeChat 已连接</span>
+                </div>
+                <p class="timestamp">最后更新: <span id="time"></span></p>
+            </div>
+            
+            <div class="card">
+                <h2>🔧 模型配置</h2>
+                <p><strong>当前模型:</strong> MiniMax-M3</p>
+                <p><strong>API状态:</strong> 已配置</p>
+                <p><strong>上下文窗口:</strong> 512K tokens</p>
+            </div>
+            
+            <div class="card">
+                <h2>📁 当前项目</h2>
+                <p><strong>课题1:</strong> PSWCs 上善水质子水研究</p>
+                <p><strong>课题2:</strong> LA-NPC 官键研究</p>
+                <a href="https://pswcdeploy.vercel.app" class="link" target="_blank">打开 PSWCs 研究站</a>
+            </div>
+            
+            <div class="card">
+                <h2>📈 统计数据</h2>
+                <p class="metric" id="uptime">运行中</p>
+                <p>服务正常运行</p>
+            </div>
+            
+            <div class="card">
+                <h2>🔗 快速链接</h2>
+                <a href="https://pswcdeploy.vercel.app" class="link" target="_blank">PSWCs 研究站</a>
+                <a href="https://auth-site.vercel.app" class="link" target="_blank" style="background:#4ade80;">登录系统</a>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById('time').textContent = new Date().toLocaleString('zh-CN');
+        setInterval(() => {
+            document.getElementById('time').textContent = new Date().toLocaleString('zh-CN');
+        }, 60000);
+    </script>
+</body>
+</html>

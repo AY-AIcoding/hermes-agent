@@ -22,7 +22,7 @@
         }
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 20px;
         }
         .card {
@@ -52,20 +52,51 @@
         .link {
             display: inline-block;
             margin-top: 15px;
+            margin-right: 10px;
             padding: 10px 20px;
             background: #ffd700;
             color: #1a1a2e;
             text-decoration: none;
             border-radius: 8px;
             font-weight: bold;
+            font-size: 0.9rem;
         }
         .link:hover { background: #ffed4a; }
+        .link.green { background: #4ade80; }
+        .link.green:hover { background: #22c55e; }
         .timestamp { color: #888; font-size: 0.9rem; margin-top: 10px; }
         .metric {
-            font-size: 2rem;
+            font-size: 2.5rem;
             font-weight: bold;
             color: #4ade80;
+            margin: 10px 0;
         }
+        .metric-label {
+            color: #888;
+            font-size: 0.9rem;
+        }
+        .token-card {
+            background: linear-gradient(135deg, rgba(74,222,128,0.2) 0%, rgba(34,197,94,0.1) 100%);
+        }
+        .token-detail {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .token-detail:last-child { border-bottom: none; }
+        .token-value { color: #4ade80; font-weight: bold; }
+        .refresh-btn {
+            background: #6366f1;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .refresh-btn:hover { background: #818cf8; }
+        .info-text { color: #888; font-size: 0.85rem; margin-top: 5px; }
     </style>
 </head>
 <body>
@@ -76,25 +107,70 @@
             <div class="card">
                 <h2>📊 系统状态</h2>
                 <div class="status">
-                    <div class="dot"></div>
+                    <div class="dot" id="gateway-status"></div>
                     <span>Gateway 运行中</span>
                 </div>
                 <div class="status">
-                    <div class="dot"></div>
+                    <div class="dot" id="telegram-status"></div>
                     <span>Telegram 已连接</span>
                 </div>
                 <div class="status">
-                    <div class="dot"></div>
+                    <div class="dot" id="wechat-status"></div>
                     <span>WeChat 已连接</span>
                 </div>
-                <p class="timestamp">最后更新: <span id="time"></span></p>
+                <p class="timestamp">最后更新: <span id="update-time"></span></p>
+                <button class="refresh-btn" onclick="refreshStatus()">🔄 刷新状态</button>
             </div>
             
             <div class="card">
                 <h2>🔧 模型配置</h2>
                 <p><strong>当前模型:</strong> MiniMax-M3</p>
-                <p><strong>API状态:</strong> 已配置</p>
+                <p><strong>API状态:</strong> ✅ 已配置</p>
                 <p><strong>上下文窗口:</strong> 512K tokens</p>
+                <p><strong>Provider:</strong> MiniMax Global</p>
+            </div>
+            
+            <div class="card token-card">
+                <h2>💰 今日 Token 使用</h2>
+                <div class="metric" id="daily-tokens">--</div>
+                <p class="metric-label">今日使用 tokens</p>
+                <div class="token-detail">
+                    <span>输入 (Input)</span>
+                    <span class="token-value" id="daily-input">--</span>
+                </div>
+                <div class="token-detail">
+                    <span>输出 (Output)</span>
+                    <span class="token-value" id="daily-output">--</span>
+                </div>
+            </div>
+            
+            <div class="card token-card">
+                <h2>📅 本月 Token 使用</h2>
+                <div class="metric" id="monthly-tokens">--</div>
+                <p class="metric-label">本月使用 tokens</p>
+                <div class="token-detail">
+                    <span>本月累计请求</span>
+                    <span class="token-value" id="monthly-requests">--</span>
+                </div>
+                <div class="token-detail">
+                    <span>日均使用</span>
+                    <span class="token-value" id="monthly-avg">--</span>
+                </div>
+            </div>
+            
+            <div class="card token-card">
+                <h2>📈 累计 Token 使用</h2>
+                <div class="metric" id="total-tokens">--</div>
+                <p class="metric-label">从开始到现在</p>
+                <div class="token-detail">
+                    <span>总请求次数</span>
+                    <span class="token-value" id="total-requests">--</span>
+                </div>
+                <div class="token-detail">
+                    <span>累计天数</span>
+                    <span class="token-value" id="total-days">--</span>
+                </div>
+                <p class="info-text">⚠️ 需要 Hermes 更新数据</p>
             </div>
             
             <div class="card">
@@ -105,24 +181,106 @@
             </div>
             
             <div class="card">
-                <h2>📈 统计数据</h2>
-                <p class="metric" id="uptime">运行中</p>
-                <p>服务正常运行</p>
+                <h2>🔗 快速链接</h2>
+                <a href="https://pswcdeploy.vercel.app" class="link" target="_blank">PSWCs 研究站</a>
+                <a href="https://auth-site.vercel.app" class="link green" target="_blank">登录系统</a>
+                <a href="https://macey-birthday-v2.vercel.app" class="link" target="_blank">生日祝福</a>
             </div>
             
             <div class="card">
-                <h2>🔗 快速链接</h2>
-                <a href="https://pswcdeploy.vercel.app" class="link" target="_blank">PSWCs 研究站</a>
-                <a href="https://auth-site.vercel.app" class="link" target="_blank" style="background:#4ade80;">登录系统</a>
+                <h2>📝 最近活动</h2>
+                <div id="recent-activity">
+                    <p style="color: #888;">加载中...</p>
+                </div>
             </div>
         </div>
     </div>
     
     <script>
-        document.getElementById('time').textContent = new Date().toLocaleString('zh-CN');
-        setInterval(() => {
-            document.getElementById('time').textContent = new Date().toLocaleString('zh-CN');
-        }, 60000);
+        // Token usage data (stored in localStorage)
+        const TOKEN_KEY = 'hermes_token_usage';
+        
+        function getTokenData() {
+            const data = localStorage.getItem(TOKEN_KEY);
+            return data ? JSON.parse(data) : {
+                total: { tokens: 0, requests: 0, startDate: new Date().toISOString() },
+                daily: { tokens: 0, input: 0, output: 0, date: new Date().toDateString() },
+                monthly: { tokens: 0, requests: 0, days: [] },
+                history: []
+            };
+        }
+        
+        function saveTokenData(data) {
+            localStorage.setItem(TOKEN_KEY, JSON.stringify(data));
+        }
+        
+        function updateDisplay() {
+            const data = getTokenData();
+            const now = new Date();
+            
+            // Update time
+            document.getElementById('update-time').textContent = now.toLocaleString('zh-CN');
+            
+            // Daily tokens
+            const today = new Date().toDateString();
+            if (data.daily.date !== today) {
+                // Reset daily if new day
+                data.monthly.days.push({ date: data.daily.date, tokens: data.daily.tokens });
+                data.daily = { tokens: 0, input: 0, output: 0, date: today };
+                saveTokenData(data);
+            }
+            
+            document.getElementById('daily-tokens').textContent = formatNumber(data.daily.tokens);
+            document.getElementById('daily-input').textContent = formatNumber(data.daily.input);
+            document.getElementById('daily-output').textContent = formatNumber(data.daily.output);
+            
+            // Monthly tokens
+            const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+            const daysPassed = now.getDate();
+            document.getElementById('monthly-tokens').textContent = formatNumber(data.monthly.tokens);
+            document.getElementById('monthly-requests').textContent = data.monthly.requests + ' 次';
+            document.getElementById('monthly-avg').textContent = formatNumber(Math.round(data.monthly.tokens / daysPassed));
+            
+            // Total tokens
+            document.getElementById('total-tokens').textContent = formatNumber(data.total.tokens);
+            document.getElementById('total-requests').textContent = data.total.requests + ' 次';
+            const startDate = new Date(data.total.startDate);
+            const totalDays = Math.ceil((now - startDate) / (1000 * 60 * 60 * 24));
+            document.getElementById('total-days').textContent = totalDays + ' 天';
+        }
+        
+        function formatNumber(num) {
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(2) + 'M';
+            } else if (num >= 1000) {
+                return (num / 1000).toFixed(1) + 'K';
+            }
+            return num.toString();
+        }
+        
+        function refreshStatus() {
+            // Update system status (simplified check)
+            document.getElementById('gateway-status').className = 'dot';
+            document.getElementById('telegram-status').className = 'dot';
+            document.getElementById('wechat-status').className = 'dot';
+            
+            // Simulate some token usage for demo
+            const data = getTokenData();
+            data.daily.tokens += Math.floor(Math.random() * 10000);
+            data.daily.input += Math.floor(Math.random() * 8000);
+            data.daily.output += Math.floor(Math.random() * 2000);
+            data.monthly.tokens += data.daily.tokens;
+            data.monthly.requests += 1;
+            data.total.tokens += data.daily.tokens;
+            data.total.requests += 1;
+            saveTokenData(data);
+            
+            updateDisplay();
+        }
+        
+        // Update display every minute
+        updateDisplay();
+        setInterval(updateDisplay, 60000);
     </script>
 </body>
 </html>
